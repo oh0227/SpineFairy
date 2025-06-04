@@ -20,6 +20,7 @@ const Input = (props) => {
           style={styles.input}
           onChangeText={onChangeText}
           value={value}
+          inputMode={props.inputmode}
         />
       </View>
 

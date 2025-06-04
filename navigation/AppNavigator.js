@@ -6,13 +6,8 @@ import { Image, StyleSheet, View } from "react-native";
 import { useSelector } from "react-redux";
 
 const AppNavigator = (props) => {
-  const isAuth = useSelector(
-    (state) => state.auth.token !== null && state.auth.token !== ""
-  );
-  const token = useSelector((state) => state.auth.token);
-  console.log(token);
-
-  const isSetUp = false;
+  const isAuth = useSelector((state) => state.auth.isLogIn);
+  const isSetUp = useSelector((state) => state.auth.isSetUp);
 
   return (
     <NavigationContainer>

@@ -8,8 +8,10 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import colors from "./constants/colors";
 import { Provider } from "react-redux";
 import { store } from "./store/store";
+import { enableScreens } from "react-native-screens";
 
 SplashScreen.preventAutoHideAsync();
+enableScreens();
 
 const App = () => {
   SplashScreen.preventAutoHideAsync();

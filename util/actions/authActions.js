@@ -1,19 +1,36 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { authenticate, logout } from "../../store/authSlice";
+import {
+  authenticate,
+  logout,
+  updateLoggedInUserData,
+} from "../../store/authSlice";
+import BASE_URL from "../../constants/base_url";
 
 let timer;
 
-export const signUp = ({ firstName, lastName, email, password }) => {
+export const signUp = ({ name, email, password }) => {
   return async (dispatch) => {
     try {
       // 1. 회원가입
-      const response = await axios.post(`${BASE_URL}/user/`, {
-        first_name: firstName,
-        last_name: lastName,
+      const response = await axios.post(`${BASE_URL}/register`, {
         email,
         password,
+        name,
       });
+
+      console.log(response.data);
+
+      dispatch(
+        authenticate({
+          userData: {
+            user_id: response.data.user_id,
+            email,
+            password,
+            name,
+          },
+        })
+      );
 
       // 2. 회원가입 성공 후 바로 로그인
       dispatch(signIn({ email, password }));
@@ -28,39 +45,48 @@ export const signUp = ({ firstName, lastName, email, password }) => {
 export const signIn = ({ email, password }) => {
   return async (dispatch) => {
     try {
-      // const params = new URLSearchParams();
-      // params.append("username", email);
-      // params.append("password", password);
-
-      // const response = await axios.post(`${BASE_URL}/token`, params, {
-      //   headers: {
-      //     "Content-Type": "application/x-www-form-urlencoded",
-      //   },
-      // });
-
-      // const { access_token, token_type, user_id } = response.data;
-
-      // const expiryDate = new Date(
-      //   new Date().getTime() + 60 * 60 * 1000 // 1시간짜리 JWT 토큰 가정
-      // );
-
-      // const userData = await getUserData(user_id, access_token);
-
-      const access_token = "MASTER_KEY";
-      const userData = "USER";
+      const response = await axios.post(`${BASE_URL}/login`, {
+        email,
+        password,
+      });
 
       dispatch(
         authenticate({
-          token: access_token,
-          userData,
+          userData: {
+            user_id: response.data.user_id,
+            email,
+            password,
+          },
         })
       );
 
-      // saveDataToStorage(access_token, email, expiryDate);
+      saveDataToStorage(email);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+};
 
-      timer = setTimeout(() => {
-        dispatch(userLogout());
-      }, 60 * 60 * 1000);
+export const loadUserProfile = (user_id, { age, gender, weight, height }) => {
+  return async (dispatch) => {
+    try {
+      const response = await axios.post(`${BASE_URL}/profile`, {
+        user_id,
+        age: parseInt(age, 10),
+        gender,
+        weight: parseInt(weight, 10),
+        height: parseInt(height, 10),
+      });
+      console.log(response.status);
+
+      dispatch(
+        updateLoggedInUserData({
+          age,
+          gender,
+          weight,
+          height,
+        })
+      );
     } catch (error) {
       console.log(error);
     }
@@ -75,35 +101,11 @@ export const userLogout = () => {
   };
 };
 
-export const updateSignedInUserData = async (userId, newData, token) => {
-  try {
-    const response = await axios.post(
-      `${BASE_URL}/user/${userId}/update`,
-      {
-        first_name: newData.first_name,
-        last_name: newData.last_name,
-        email: newData.email,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    return response.data;
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-const saveDataToStorage = (token, email, expiryDate) => {
+const saveDataToStorage = (email) => {
   AsyncStorage.setItem(
     "userData",
     JSON.stringify({
-      token,
       email,
-      expiryDate: expiryDate.toISOString(),
     })
   );
 };

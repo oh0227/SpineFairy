@@ -13,6 +13,9 @@ import colors from "../constants/colors";
 import commonStyles from "../constants/commonStyles";
 import AnalysisScreen from "../screens/AnalysisScreen";
 import RecommendScreen from "../screens/ReccomendScreen";
+import UploadScreen from "../screens/UploadScreen";
+import CameraButton from "../components/CameraButton";
+import CameraWarningScreen from "../screens/CameraWarningScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -25,7 +28,7 @@ const TabNavigator = () => (
       options={{
         tabBarLabel: "Home",
         tabBarIcon: ({ color, size }) => (
-          <MaterialIcons name="dashboard" size={24} color="black" />
+          <MaterialIcons name="dashboard" size={24} color={color} />
         ),
       }}
     ></Tab.Screen>
@@ -35,17 +38,27 @@ const TabNavigator = () => (
       options={{
         tabBarLabel: "Analysis",
         tabBarIcon: ({ color, size }) => (
-          <MaterialIcons name="insert-chart" size={24} color="black" />
+          <MaterialIcons name="insert-chart" size={24} color={color} />
         ),
       }}
     ></Tab.Screen>
+    <Tab.Screen
+      name="Upload"
+      component={CameraWarningScreen}
+      options={{
+        tabBarLabel: "",
+        tabBarIcon: () => null, // 아이콘 없음
+        tabBarButton: (props) => <CameraButton {...props} />,
+      }}
+    />
+
     <Tab.Screen
       name="Train"
       component={RecommendScreen}
       options={{
         tabBarLabel: "Train",
         tabBarIcon: ({ color, size }) => (
-          <FontAwesome5 name="walking" size={24} color="black" />
+          <FontAwesome5 name="walking" size={24} color={color} />
         ),
       }}
     ></Tab.Screen>
@@ -55,7 +68,7 @@ const TabNavigator = () => (
       options={{
         tabBarLabel: "Setting",
         tabBarIcon: ({ color, size }) => (
-          <Ionicons name="settings-outline" size={size} color={color} />
+          <Ionicons name="settings" size={size} color={color} />
         ),
       }}
     />
@@ -64,13 +77,21 @@ const TabNavigator = () => (
 
 const StackNavigator = () => (
   <Stack.Navigator>
-    <Stack.Group>
-      <Stack.Screen
-        name="Home"
-        component={TabNavigator}
-        options={{ headerShown: false }}
-      />
-    </Stack.Group>
+    <Stack.Screen
+      name="MainTabs"
+      component={TabNavigator}
+      options={{ headerShown: false }}
+    />
+    <Stack.Screen
+      name="CameraWarning"
+      component={CameraWarningScreen}
+      options={{ title: "주의사항" }}
+    />
+    <Stack.Screen
+      name="Upload"
+      component={UploadScreen}
+      options={{ title: "사진 업로드" }}
+    />
   </Stack.Navigator>
 );
 
@@ -85,7 +106,7 @@ const MainNavigator = () => {
     );
   }
 
-  return <TabNavigator />;
+  return <StackNavigator />;
 };
 
 export default MainNavigator;
