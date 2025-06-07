@@ -19,8 +19,6 @@ export const signUp = ({ name, email, password }) => {
         name,
       });
 
-      console.log(response.data);
-
       dispatch(
         authenticate({
           userData: {
@@ -54,6 +52,7 @@ export const signIn = ({ email, password }) => {
         authenticate({
           userData: {
             user_id: response.data.user_id,
+            name: response.data.name,
             email,
             password,
           },

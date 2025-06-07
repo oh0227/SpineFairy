@@ -1,0 +1,132 @@
+{
+  "changes": {
+    "ear_hip_vertical_tilt_deg": 0,
+    "hip_height_diff_px": -14,
+    "hip_line_horizontal_tilt_deg": -6.33,
+    "shoulder_height_diff_px": -13,
+    "shoulder_line_horizontal_tilt_deg": -3.43,
+    "torso_vertical_tilt_deg": 0.54
+  },
+  "composite_max": 9.864233248299314,
+  "composite_mean": 5.148697425888777,
+  "composite_min": 0.6988751000552629,
+  "composite_percentile": null,
+  "composite_score_current": null,
+  "composite_std": 2.413010592134889,
+  "days_since": 0,
+  "history": [
+    {
+      "composite_score": 0.6988751000552629,
+      "created_at": "2025-06-05T22:32:29.995620+09:00",
+      "ear_hip_vertical_tilt_deg": 0.6693127716096328,
+      "feature_id": 1422,
+      "hip_height_diff_px": 1,
+      "hip_line_horizontal_tilt_deg": 0.48146580583835247,
+      "shoulder_height_diff_px": 1,
+      "shoulder_line_horizontal_tilt_deg": 0.29841281999488256,
+      "torso_vertical_tilt_deg": 0.7440592028887094,
+      "visuals": []
+    },
+    {
+      "composite_score": 9.864233248299314,
+      "created_at": "2025-06-05T22:33:18.971690+09:00",
+      "ear_hip_vertical_tilt_deg": 2.9224726680249034,
+      "feature_id": 1423,
+      "hip_height_diff_px": 6,
+      "hip_line_horizontal_tilt_deg": 1.4878675288277787,
+      "shoulder_height_diff_px": 38,
+      "shoulder_line_horizontal_tilt_deg": 6.648645183268905,
+      "torso_vertical_tilt_deg": 4.126414109674297,
+      "visuals": []
+    },
+    {
+      "composite_score": 6.77518451174605,
+      "created_at": "2025-06-05T22:36:11.793671+09:00",
+      "ear_hip_vertical_tilt_deg": 0.5650288179074557,
+      "feature_id": 1425,
+      "hip_height_diff_px": 16,
+      "hip_line_horizontal_tilt_deg": 7.657709693713878,
+      "shoulder_height_diff_px": 13,
+      "shoulder_line_horizontal_tilt_deg": 3.428368558854966,
+      "torso_vertical_tilt_deg": 0,
+      "visuals": []
+    },
+    {
+      "composite_score": 6.77518451174605,
+      "created_at": "2025-06-05T22:53:29.435604+09:00",
+      "ear_hip_vertical_tilt_deg": 0.5650288179074557,
+      "feature_id": 1426,
+      "hip_height_diff_px": 16,
+      "hip_line_horizontal_tilt_deg": 7.657709693713878,
+      "shoulder_height_diff_px": 13,
+      "shoulder_line_horizontal_tilt_deg": 3.428368558854966,
+      "torso_vertical_tilt_deg": 0,
+      "visuals": []
+    },
+    {
+      "composite_score": null,
+      "created_at": "2025-06-05T22:57:29.594074+09:00",
+      "ear_hip_vertical_tilt_deg": 0,
+      "feature_id": 1427,
+      "hip_height_diff_px": 2,
+      "hip_line_horizontal_tilt_deg": 1.3322198538696388,
+      "shoulder_height_diff_px": 0,
+      "shoulder_line_horizontal_tilt_deg": 0,
+      "torso_vertical_tilt_deg": 0.5430716937237866,
+      "visuals": []
+    }
+  ],
+  "last_upload_date": "2025-06-05T22:36:11.793671+09:00",
+  "message": "업로드, 분석, 운동추천, 영상추천, 리포트 생성 완료",
+  "metrics": {
+    "ear_hip_vertical_tilt_deg": 0,
+    "hip_height_diff_px": 2,
+    "hip_line_horizontal_tilt_deg": 1.3322198538696388,
+    "shoulder_height_diff_px": 0,
+    "shoulder_line_horizontal_tilt_deg": 0,
+    "torso_vertical_tilt_deg": 0.5430716937237866
+  },
+  "recommendations": [
+    { "exercise": "Seated Marching", "probability": 30 },
+    { "exercise": "Diaphragmatic Breathing", "probability": 20 },
+    { "exercise": "Seated Marches", "probability": 13 }
+  ],
+  "report": "",
+  "user": {
+    "age": 23,
+    "gender": "남성",
+    "height": 23,
+    "name": "테스트",
+    "user_id": 5,
+    "weight": 23
+  },
+  "videos": [
+    {
+      "exercise": "Seated Marching",
+      "thumbnail_url": "https://i.ytimg.com/vi/uoRVJBDEX60/mqdefault.jpg",
+      "video_desc": "This gentle sitting stretch will help improve your mobility, reduce low back pain, and can even be done at home. All you need is a ...",
+      "video_title": "Seated Marching Stretch for Lower Back Pain",
+      "video_url": "https://www.youtube.com/watch?v=uoRVJBDEX60"
+    },
+    {
+      "exercise": "Diaphragmatic Breathing",
+      "thumbnail_url": "https://i.ytimg.com/vi/g2wo2Impnfg/mqdefault.jpg",
+      "video_desc": "Suzanne Smith, MSN, NP, CMT-P, nurse practitioner in the Integrative Digestive Health and Wellness Program in the UCLA ...",
+      "video_title": "Diaphragmatic Breathing | UCLA Integrative Digestive Health and Wellness Program",
+      "video_url": "https://www.youtube.com/watch?v=g2wo2Impnfg"
+    },
+    {
+      "exercise": "Seated Marches",
+      "thumbnail_url": "https://i.ytimg.com/vi/uoRVJBDEX60/mqdefault.jpg",
+      "video_desc": "This gentle sitting stretch will help improve your mobility, reduce low back pain, and can even be done at home. All you need is a ...",
+      "video_title": "Seated Marching Stretch for Lower Back Pain",
+      "video_url": "https://www.youtube.com/watch?v=uoRVJBDEX60"
+    }
+  ],
+  "visuals": {
+    "ear_hip_tilt": "http://34.64.189.251:8000/static/pose_results/user_example@example.com_photo_ear_hip_tilt.png",
+    "keypoints": "http://34.64.189.251:8000/static/pose_results/user_example@example.com_photo_keypoints.png",
+    "shoulder_hip": "http://34.64.189.251:8000/static/pose_results/user_example@example.com_photo_shoulder_hip.png",
+    "torso_tilt": "http://34.64.189.251:8000/static/pose_results/user_example@example.com_photo_torso_tilt.png"
+  }
+}

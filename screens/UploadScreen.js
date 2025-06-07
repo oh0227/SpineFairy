@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useDispatch, useSelector } from "react-redux";
-import { setReport } from "../store/reportSlice";
+import { addReport } from "../store/reportSlice";
 import axios from "axios";
 import BASE_URL from "../constants/base_url";
 
@@ -50,19 +50,17 @@ const UploadScreen = ({ navigation }) => {
       type: "image/jpeg",
       name: "photo.jpg",
     });
+    formData.append("email", userData.email);
 
     try {
-      const res = await axios.post(
-        `${BASE_URL}/upload-image?user_id=${userData.user_id}`, // ⚠️ 실제 서버 주소로 교체
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const res = await axios.post(`${BASE_URL}/upload-image`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-      dispatch(setReport(res.data));
+      // 업로드 성공 시
+      dispatch(addReport(res.data));
 
       Alert.alert("업로드 완료");
     } catch (err) {

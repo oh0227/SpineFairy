@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   View,
   Text,
@@ -8,72 +8,184 @@ import {
   Dimensions,
   Image,
 } from "react-native";
+import { useSelector } from "react-redux";
+import { Svg, Path, Circle } from "react-native-svg";
+import { range } from "d3-array";
+import { scaleLinear } from "d3-scale";
+import * as d3Shape from "d3-shape";
 import hospitalLogo from "../assets/images/hospital_logo.png";
+import logo from "../assets/images/logo.png";
 
-const { width } = Dimensions.get("window");
+const { width: screenWidth } = Dimensions.get("window");
+const GRAPH_WIDTH = screenWidth * 0.85;
+const GRAPH_HEIGHT = 100;
 
-const HomeScreen = (props) => {
+const HomeScreen = () => {
+  const reportData = useSelector((state) => state.report.reportData);
+  const userData = useSelector((state) => state.auth.userData);
+  const history = reportData?.history ?? [];
+  const last = history[history.length - 1] || {};
+  const prev = history[history.length - 2] || {};
+
+  useEffect(() => {
+    console.log(reportData);
+  }, []);
+
+  const {
+    composite_mean,
+    composite_std,
+    composite_score_current,
+    composite_min,
+    composite_max,
+    composite_percentile,
+  } = reportData;
+
+  const xScale = scaleLinear()
+    .domain([composite_min - 1, composite_max + 1])
+    .range([0, GRAPH_WIDTH]);
+
+  const yScale = scaleLinear().domain([0, 1]).range([GRAPH_HEIGHT, 0]);
+
+  const createNormalDistPath = () => {
+    if (!composite_mean || !composite_std) return "";
+    const normal = d3Shape
+      .line()
+      .x((d) => xScale(d))
+      .y((d) =>
+        yScale(
+          (1 / (composite_std * Math.sqrt(2 * Math.PI))) *
+            Math.exp(-0.5 * Math.pow((d - composite_mean) / composite_std, 2))
+        )
+      );
+
+    const xValues = range(
+      composite_min - 1,
+      composite_max + 1,
+      (composite_max - composite_min) / 100
+    );
+
+    return normal(xValues);
+  };
+
+  const getNormalY = (xVal) => {
+    if (!composite_std || !composite_mean) return GRAPH_HEIGHT / 2;
+    const yVal =
+      (1 / (composite_std * Math.sqrt(2 * Math.PI))) *
+      Math.exp(-0.5 * Math.pow((xVal - composite_mean) / composite_std, 2));
+    return yScale(yVal);
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
+      <View style={styles.hospitalContainer}>
+        <Image source={hospitalLogo} style={styles.hospitalLogo} />
+      </View>
       <ScrollView contentContainerStyle={styles.container}>
-        {/* Header */}
-        <View style={styles.hospitalContainer}>
-          <Image
-            source={hospitalLogo}
-            style={styles.hospitalLogo}
-            resizeMode="contain"
-          />
+        <View style={styles.greetingContainer}>
+          <View style={styles.logoContainer}>
+            <Image source={logo} style={styles.logo} />
+          </View>
+          <Text style={styles.greeting}>
+            안녕하세요 {userData?.name || "OOO"} 회원님!
+          </Text>
         </View>
-        <Text style={styles.greeting}>안녕하세요 OOO 회원님!</Text>
 
-        {/* 척만증 종합 분석 카드 */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>측만증 종합 분석</Text>
+          <Text style={styles.cardTitle}>📊 종합 점수 분포</Text>
           <Text style={styles.cardDesc}>
-            측만증의 확인을 종합 분석으로 환자의 정면 사진에서 추출한 지표들을
-            바탕으로 측만증 지표를 계산합니다.
+            아래 그래프는 사용자의 체형 점수가 전체 분포 중 어디에 위치하는지를
+            나타냅니다.
           </Text>
-          {/* 그래프 영역 (간단한 곡선 및 점) */}
-          <View style={styles.graphArea}>
-            <View style={styles.graphLine} />
-            <View style={styles.graphDot} />
-          </View>
-          {/* 하위 10% 안내 */}
-          <View style={styles.alertBox}>
-            <Text style={styles.alertText}>청년 여성 기준 하위 10%입니다</Text>
-          </View>
-          <Text style={styles.cardNotice}>
-            일상에서의 불편함이 있을 수 있으며 지속적인 관리가 필요해 보입니다.
-          </Text>
-          <Text style={styles.smallNotice}>
-            ※ 정확한 치료는 반드시 대면 진료를 통해서 받으시기 바랍니다.
+
+          <Svg
+            width={GRAPH_WIDTH}
+            height={GRAPH_HEIGHT}
+            style={{ alignSelf: "center" }}
+          >
+            {composite_mean && composite_std ? (
+              <>
+                <Path
+                  d={createNormalDistPath()}
+                  stroke="#fff"
+                  strokeWidth={2}
+                  fill="none"
+                />
+                {composite_score_current != null && (
+                  <Circle
+                    cx={xScale(composite_score_current)}
+                    cy={getNormalY(composite_score_current)}
+                    r={6}
+                    fill="#e74c3c"
+                  />
+                )}
+              </>
+            ) : (
+              <Text
+                style={{
+                  color: "#fff",
+                  fontSize: 13,
+                  textAlign: "center",
+                  marginTop: 30,
+                }}
+              >
+                데이터가 부족하여 그래프를 표시할 수 없습니다.
+              </Text>
+            )}
+          </Svg>
+
+          <Text style={styles.alertText}>
+            현재 위치: {composite_score_current?.toFixed(2) ?? "-"}점 (상위{" "}
+            {composite_percentile ?? "-"}%)
           </Text>
         </View>
 
-        {/* 세부 지표 변화 추이 카드 */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>세부 지표 변화 추이</Text>
-          <Text style={styles.cardDescSmall}>
-            OOO님 · 여성 · 30대{"\n"}최근 촬영일 2025-04-26 | 지난 촬영일
-            2025-04-22
-          </Text>
-          {/* 예시 테이블 */}
+          <Text style={styles.cardTitle}>📈 세부 지표 변화 추이</Text>
+
           <View style={styles.tableHeader}>
-            <Text style={[styles.tableCell, { flex: 2 }]}>지표 (단위)</Text>
-            <Text style={styles.tableCell}>최근</Text>
+            <Text style={[styles.tableCell, { flex: 2 }]}>지표</Text>
             <Text style={styles.tableCell}>이전</Text>
+            <Text style={styles.tableCell}>최근</Text>
             <Text style={styles.tableCell}>변화</Text>
-            <Text style={styles.tableCell}>랭킹</Text>
           </View>
-          {/* 예시 데이터 행 */}
-          <View style={styles.tableRow}>
-            <Text style={[styles.tableCell, { flex: 2 }]}>Shoulder Slope</Text>
-            <Text style={styles.tableCell}>88P</Text>
-            <Text style={styles.tableCell}>+1.6</Text>
-            <Text style={styles.tableCell}>8P</Text>
-            <Text style={styles.tableCell}>주의</Text>
-          </View>
-          {/* 추가 행은 map으로 반복 */}
+
+          {[
+            { key: "shoulder_height_diff_px", label: "어깨 높이(px)" },
+            { key: "hip_height_diff_px", label: "골반 높이(px)" },
+            {
+              key: "shoulder_line_horizontal_tilt_deg",
+              label: "어깨 기울기(°)",
+            },
+            { key: "hip_line_horizontal_tilt_deg", label: "골반 기울기(°)" },
+            { key: "torso_vertical_tilt_deg", label: "몸통 수직 기울기(°)" },
+            { key: "ear_hip_vertical_tilt_deg", label: "귀-골반 기울기(°)" },
+          ].map(({ key, label }) => {
+            const before = prev?.[key]?.toFixed(2) ?? "-";
+            const after = last?.[key]?.toFixed(2) ?? "-";
+            const delta = reportData?.changes?.[key] ?? "-";
+
+            return (
+              <View style={styles.tableRow} key={key}>
+                <Text style={[styles.tableCell, { flex: 2 }]}>{label}</Text>
+                <Text style={styles.tableCell}>{before}</Text>
+                <Text style={styles.tableCell}>{after}</Text>
+                <Text style={styles.tableCell}>{delta}</Text>
+              </View>
+            );
+          })}
+
+          {!last || !Object.keys(last).length ? (
+            <Text
+              style={{
+                color: "#ccc",
+                fontSize: 12,
+                textAlign: "center",
+                marginTop: 8,
+              }}
+            >
+              아직 측정 데이터가 없습니다. 데이터를 등록해주세요.
+            </Text>
+          ) : null}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -84,82 +196,52 @@ export default HomeScreen;
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: "#fff" },
-  container: { padding: 16, backgroundColor: "#fff" },
+  container: { padding: 16 },
   hospitalContainer: {
     justifyContent: "flex-start",
     alignItems: "flex-start",
-    maxHeight: 200,
+    marginLeft: 16,
+    marginTop: 16,
+    marginBottom: -16,
   },
-  hospitalLogo: {
-    width: 120,
-    maxHeight: 200,
+  hospitalLogo: { width: 120, height: 60, resizeMode: "contain" },
+  greetingContainer: {
+    display: "flex",
+    flexDirection: "row",
   },
-  logo: { fontSize: 20, fontWeight: "bold", color: "#2c4a6b" },
-  subLogo: { fontSize: 12, color: "#2c4a6b" },
   greeting: {
     fontSize: 18,
     fontWeight: "bold",
     marginVertical: 12,
     textAlign: "center",
+    justifyContent: "flex-end",
+    alignItems: "flex-end",
   },
+  logoContainer: {
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
+    maxHeight: 60,
+  },
+  logo: { width: 45, height: 45, resizeMode: "contain" },
   card: {
     backgroundColor: "#22405a",
     borderRadius: 16,
     padding: 18,
-    marginBottom: 18,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+    marginBottom: 20,
   },
   cardTitle: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
-    marginBottom: 6,
+    marginBottom: 10,
   },
-  cardDesc: { color: "#d9e6f2", fontSize: 13, marginBottom: 14 },
-  graphArea: {
-    height: 80,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  graphLine: {
-    width: width * 0.6,
-    height: 2,
-    backgroundColor: "#fff",
-    borderRadius: 1,
-    position: "absolute",
-    top: 40,
-    left: width * 0.1,
-  },
-  graphDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: "#e74c3c",
-    position: "absolute",
-    left: width * 0.22,
-    top: 36,
-    borderWidth: 2,
-    borderColor: "#fff",
-  },
-  alertBox: {
-    backgroundColor: "#e74c3c",
-    borderRadius: 6,
-    paddingVertical: 6,
-    marginBottom: 6,
-  },
-  alertText: { color: "#fff", fontWeight: "bold", textAlign: "center" },
-  cardNotice: {
+  cardDesc: { color: "#d9e6f2", fontSize: 13, marginBottom: 12 },
+  alertText: {
     color: "#fff",
-    fontSize: 12,
-    marginBottom: 6,
+    fontSize: 13,
     textAlign: "center",
+    marginTop: 10,
   },
-  smallNotice: { color: "#b0c4de", fontSize: 11, textAlign: "center" },
-  cardDescSmall: { color: "#d9e6f2", fontSize: 12, marginBottom: 8 },
   tableHeader: {
     flexDirection: "row",
     borderBottomWidth: 1,
@@ -167,6 +249,6 @@ const styles = StyleSheet.create({
     paddingBottom: 4,
     marginBottom: 2,
   },
-  tableRow: { flexDirection: "row", paddingVertical: 3 },
-  tableCell: { color: "#fff", fontSize: 11, flex: 1, textAlign: "center" },
+  tableRow: { flexDirection: "row", paddingVertical: 4 },
+  tableCell: { color: "#fff", fontSize: 12, flex: 1, textAlign: "center" },
 });

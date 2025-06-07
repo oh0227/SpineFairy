@@ -1,6 +1,6 @@
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import AuthScreen from "../screens/AuthSreen";
+import AuthScreen from "../screens/AuthScreen";
 import PostAuthNavigator from "./PostAuthNavigator";
 import { Image, StyleSheet, View } from "react-native";
 import { useSelector } from "react-redux";

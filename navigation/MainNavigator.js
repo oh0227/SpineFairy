@@ -12,7 +12,7 @@ import HomeScreen from "../screens/HomeScreen";
 import colors from "../constants/colors";
 import commonStyles from "../constants/commonStyles";
 import AnalysisScreen from "../screens/AnalysisScreen";
-import RecommendScreen from "../screens/ReccomendScreen";
+import RecommendScreen from "../screens/RecommendScreen";
 import UploadScreen from "../screens/UploadScreen";
 import CameraButton from "../components/CameraButton";
 import CameraWarningScreen from "../screens/CameraWarningScreen";

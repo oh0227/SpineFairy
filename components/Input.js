@@ -51,7 +51,6 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     width: "100%",
-    backgroundColor: "red",
     paddingHorizontal: 20,
     paddingVertical: 10,
 

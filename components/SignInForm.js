@@ -18,8 +18,8 @@ const initialState = {
     password: isTestMode ? "1234" : "",
   },
   inputValidities: {
-    email: isTestMode,
-    password: isTestMode,
+    email: false,
+    password: false,
   },
   formIsValid: isTestMode,
 };
@@ -59,8 +59,6 @@ const SignInForm = (props) => {
       <Input
         id="email"
         label="Email"
-        icon="mail"
-        iconPack={Feather}
         autoCapitalize="none"
         keyboardType="email-address"
         onInputChanged={inputChangedHandler}
@@ -70,8 +68,6 @@ const SignInForm = (props) => {
       <Input
         id="password"
         label="Password"
-        icon="lock"
-        iconPack={Feather}
         autoCapitalize="none"
         secureTextEntry
         onInputChanged={inputChangedHandler}
