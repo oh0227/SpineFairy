@@ -10,7 +10,7 @@ import colors from "../constants/colors";
 import { validateInput } from "../util/actions/formAction";
 import { setUp } from "../store/authSlice";
 
-const isTestMode = true;
+const isTestMode = false;
 
 const initialState = {
   inputValues: {
