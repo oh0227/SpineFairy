@@ -14,6 +14,7 @@ import { useSelector } from "react-redux";
 import hospitalLogo from "../assets/images/hospital_logo.png";
 import Indicator from "../components/Indicator";
 import ChartBox from "../components/ChartBox";
+import ImageViewing from "react-native-image-viewing";
 
 // 데이터 유효성 검사 함수
 function sanitizeData(arr) {
@@ -83,6 +84,8 @@ const AnalysisScreen = () => {
   const previous = selectedIndex > 0 ? history[selectedIndex - 1] : null;
   const differences = previous ? getDifferences(selected, previous) : {};
   const dateLabels = history.map((h) => formatShortDate(h.created_at));
+  const [zoomVisible, setZoomVisible] = useState(false);
+  const [zoomIndex, setZoomIndex] = useState(0);
 
   const isEmpty = history.length === 0;
 
@@ -130,6 +133,10 @@ const AnalysisScreen = () => {
       uri: visuals.ear_hip_tilt,
     },
   ];
+
+  const imageSources = images.map((img) => ({
+    uri: img.uri || "https://dummyimage.com/120x180/cccccc/fff&text=Photo",
+  }));
 
   const renderDropdown = () => (
     <Modal transparent visible={modalVisible} animationType="fade">
@@ -221,16 +228,26 @@ const AnalysisScreen = () => {
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {images.map((img) => (
               <View key={img.key} style={styles.imageCard}>
-                <Image
-                  source={
-                    img.uri
-                      ? { uri: img.uri }
-                      : {
-                          uri: "https://dummyimage.com/120x180/cccccc/fff&text=Photo",
-                        }
-                  }
-                  style={styles.analysisImg}
-                />
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onPress={() => {
+                    if (img.uri) {
+                      setZoomIndex(images.findIndex((i) => i.key === img.key));
+                      setZoomVisible(true);
+                    }
+                  }}
+                >
+                  <Image
+                    source={
+                      img.uri
+                        ? { uri: img.uri }
+                        : {
+                            uri: "https://dummyimage.com/120x180/cccccc/fff&text=Photo",
+                          }
+                    }
+                    style={styles.analysisImg}
+                  />
+                </TouchableOpacity>
                 <View
                   style={{
                     height: 1,
@@ -250,7 +267,7 @@ const AnalysisScreen = () => {
                     return (
                       <Indicator
                         key={idx}
-                        label={ind.label}
+                        label={`${ind.label} (변화량)`}
                         value={isEmpty ? null : showValue}
                         unit={unit}
                       />
@@ -328,6 +345,14 @@ const AnalysisScreen = () => {
           )}
         </View>
       </ScrollView>
+      <ImageViewing
+        images={imageSources}
+        imageIndex={zoomIndex}
+        visible={zoomVisible}
+        onRequestClose={() => setZoomVisible(false)}
+        swipeToCloseEnabled
+        doubleTapToZoomEnabled
+      />
     </SafeAreaView>
   );
 };
