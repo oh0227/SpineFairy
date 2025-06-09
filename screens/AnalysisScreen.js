@@ -72,19 +72,16 @@ function formatShortDate(isoString) {
 }
 
 function getKeyFromLabel(label) {
-  if (label.includes("어깨") && label.includes("기울기"))
-    return "shoulder_line_horizontal_tilt_deg";
-  if (label.includes("어깨") && label.includes("높이"))
-    return "shoulder_height_diff_px";
-  if (label.includes("골반") && label.includes("기울기"))
-    return "hip_line_horizontal_tilt_deg";
-  if (label.includes("골반") && label.includes("높이"))
-    return "hip_height_diff_px";
-  if (label.includes("척추")) return "torso_vertical_tilt_deg";
-  if (label.includes("귀") || label.includes("귀-골반"))
-    return "ear_hip_vertical_tilt_deg";
+  const mapping = {
+    "어깨 기울기": "shoulder_line_horizontal_tilt_deg",
+    "어깨 높이 차이": "shoulder_height_diff_px",
+    "골반 기울기": "hip_line_horizontal_tilt_deg",
+    "골반 높이 차이": "hip_height_diff_px",
+    "척추 기울기": "torso_vertical_tilt_deg",
+    "귀-골반 수직 기울기": "ear_hip_vertical_tilt_deg",
+  };
 
-  return "";
+  return mapping[label] || "";
 }
 
 const AnalysisScreen = () => {
@@ -279,13 +276,12 @@ const AnalysisScreen = () => {
                         ? ind.value
                         : null;
                     const unit = ind.label.includes("높이") ? "px" : "°";
-                    const originalValueLabel = getKeyFromLabel(ind.label);
 
                     return (
                       <Indicator
                         key={idx}
                         label={ind.label}
-                        originalValue={selected[originalValueLabel]}
+                        originalValue={selected[getKeyFromLabel(ind.label)]}
                         changeValue={isEmpty ? null : showValue}
                         unit={unit}
                       />
