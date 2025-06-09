@@ -2,8 +2,9 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 // 인디케이터 컴포넌트
-function Indicator({ label, value, unit = "°" }) {
-  const isValidNumber = typeof value === "number" && isFinite(value);
+function Indicator({ label, originalValue, changeValue, unit = "°" }) {
+  const isValidNumber =
+    typeof changeValue === "number" && isFinite(changeValue);
 
   return (
     <View style={styles.indicatorBox}>
@@ -12,18 +13,29 @@ function Indicator({ label, value, unit = "°" }) {
         <Text
           style={[
             styles.indicatorValue,
-            isValidNumber && value > 0 && { color: "#e74c3c" },
-            isValidNumber && value < 0 && { color: "#27ae60" },
+            isValidNumber && changeValue > 0 && { color: "#e74c3c" },
+            isValidNumber && changeValue < 0 && { color: "#27ae60" },
           ]}
         >
-          {isValidNumber ? `${value.toFixed(2)}${unit}` : "-"}
+          {isValidNumber
+            ? `${originalValue.toFixed(2)} (${changeValue.toFixed(2)}${unit}`
+            : "-"}
         </Text>
-        {isValidNumber && value > 0 && (
+        {isValidNumber && changeValue > 0 && (
           <Text style={{ color: "#e74c3c", marginLeft: 2 }}>↑</Text>
         )}
-        {isValidNumber && value < 0 && (
+        {isValidNumber && changeValue < 0 && (
           <Text style={{ color: "#27ae60", marginLeft: 2 }}>↓</Text>
         )}
+        <Text
+          style={[
+            styles.indicatorValue,
+            isValidNumber && changeValue > 0 && { color: "#e74c3c" },
+            isValidNumber && changeValue < 0 && { color: "#27ae60" },
+          ]}
+        >
+          {isValidNumber ? ")" : ""}
+        </Text>
       </View>
     </View>
   );

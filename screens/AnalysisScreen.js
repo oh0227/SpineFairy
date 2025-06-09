@@ -71,6 +71,22 @@ function formatShortDate(isoString) {
   return `${mmdd}|${time}`; // ← 이게 핵심
 }
 
+function getKeyFromLabel(label) {
+  if (label.includes("어깨") && label.includes("기울기"))
+    return "shoulder_line_horizontal_tilt_deg";
+  if (label.includes("어깨") && label.includes("높이"))
+    return "shoulder_height_diff_px";
+  if (label.includes("골반") && label.includes("기울기"))
+    return "hip_line_horizontal_tilt_deg";
+  if (label.includes("골반") && label.includes("높이"))
+    return "hip_height_diff_px";
+  if (label.includes("척추")) return "torso_vertical_tilt_deg";
+  if (label.includes("귀") || label.includes("귀-골반"))
+    return "ear_hip_vertical_tilt_deg";
+
+  return "";
+}
+
 const AnalysisScreen = () => {
   const reportData = useSelector((state) => state?.report?.reportData);
   const history = reportData?.history || [];
@@ -263,12 +279,14 @@ const AnalysisScreen = () => {
                         ? ind.value
                         : null;
                     const unit = ind.label.includes("높이") ? "px" : "°";
+                    const originalValueLabel = getKeyFromLabel(ind.label);
 
                     return (
                       <Indicator
                         key={idx}
-                        label={`${ind.label} (변화량)`}
-                        value={isEmpty ? null : showValue}
+                        label={ind.label}
+                        originalValue={selected[originalValueLabel]}
+                        changeValue={isEmpty ? null : showValue}
                         unit={unit}
                       />
                     );
