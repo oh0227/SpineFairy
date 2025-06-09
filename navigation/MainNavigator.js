@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { ActivityIndicator, View } from "react-native";
 
@@ -12,7 +13,7 @@ import HomeScreen from "../screens/HomeScreen";
 import colors from "../constants/colors";
 import commonStyles from "../constants/commonStyles";
 import AnalysisScreen from "../screens/AnalysisScreen";
-import RecommendScreen from "../screens/RecommendScreen";
+import RecommendScreen from "../screens/RecommandScreen";
 import UploadScreen from "../screens/UploadScreen";
 import CameraButton from "../components/CameraButton";
 import CameraWarningScreen from "../screens/CameraWarningScreen";
@@ -53,12 +54,12 @@ const TabNavigator = () => (
     />
 
     <Tab.Screen
-      name="Train"
+      name="AI"
       component={RecommendScreen}
       options={{
-        tabBarLabel: "Train",
+        tabBarLabel: "AI",
         tabBarIcon: ({ color, size }) => (
-          <FontAwesome5 name="walking" size={24} color={color} />
+          <MaterialCommunityIcons name="robot" size={24} color={color} />
         ),
       }}
     ></Tab.Screen>

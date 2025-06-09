@@ -9,7 +9,7 @@ import {
   Image,
 } from "react-native";
 import { useSelector } from "react-redux";
-import { Svg, Path, Circle } from "react-native-svg";
+import { Svg, Path, Circle, Rect } from "react-native-svg";
 import { range } from "d3-array";
 import { scaleLinear } from "d3-scale";
 import * as d3Shape from "d3-shape";
@@ -20,60 +20,94 @@ const { width: screenWidth } = Dimensions.get("window");
 const GRAPH_WIDTH = screenWidth * 0.85;
 const GRAPH_HEIGHT = 100;
 
+// 변화량 계산 함수
+function getDifferences(current, previous) {
+  if (!current || !previous) return {};
+  const keys = [
+    "shoulder_line_horizontal_tilt_deg",
+    "shoulder_height_diff_px",
+    "hip_line_horizontal_tilt_deg",
+    "hip_height_diff_px",
+    "torso_vertical_tilt_deg",
+    "ear_hip_vertical_tilt_deg",
+  ];
+
+  const diffs = {};
+  keys.forEach((key) => {
+    const currentVal = Number(current?.[key] ?? 0);
+    const prevVal = Number(previous?.[key] ?? 0);
+    diffs[key] = currentVal - prevVal;
+  });
+
+  return diffs;
+}
+
 const HomeScreen = () => {
   const reportData = useSelector((state) => state.report.reportData);
   const userData = useSelector((state) => state.auth.userData);
   const history = reportData?.history ?? [];
   const last = history[history.length - 1] || {};
   const prev = history[history.length - 2] || {};
-
-  useEffect(() => {
-    console.log(reportData);
-  }, []);
+  const differences = getDifferences(last, prev);
 
   const {
     composite_mean,
     composite_std,
     composite_score_current,
+    composite_percentile,
     composite_min,
     composite_max,
-    composite_percentile,
   } = reportData;
 
-  const xScale = scaleLinear()
-    .domain([composite_min - 1, composite_max + 1])
-    .range([0, GRAPH_WIDTH]);
+  let xScale, yScale, getNormalY, createNormalDistPath;
+  if (composite_mean && composite_std) {
+    const xMin = composite_mean - 3 * composite_std;
+    const xMax = composite_mean + 3 * composite_std;
 
-  const yScale = scaleLinear().domain([0, 1]).range([GRAPH_HEIGHT, 0]);
+    xScale = scaleLinear()
+      .domain([xMax, xMin]) // 좌우 반전
+      .range([0, GRAPH_WIDTH]);
 
-  const createNormalDistPath = () => {
-    if (!composite_mean || !composite_std) return "";
-    const normal = d3Shape
-      .line()
-      .x((d) => xScale(d))
-      .y((d) =>
-        yScale(
-          (1 / (composite_std * Math.sqrt(2 * Math.PI))) *
-            Math.exp(-0.5 * Math.pow((d - composite_mean) / composite_std, 2))
-        )
-      );
-
-    const xValues = range(
-      composite_min - 1,
-      composite_max + 1,
-      (composite_max - composite_min) / 100
-    );
-
-    return normal(xValues);
-  };
-
-  const getNormalY = (xVal) => {
-    if (!composite_std || !composite_mean) return GRAPH_HEIGHT / 2;
-    const yVal =
+    const getGaussian = (x) =>
       (1 / (composite_std * Math.sqrt(2 * Math.PI))) *
-      Math.exp(-0.5 * Math.pow((xVal - composite_mean) / composite_std, 2));
-    return yScale(yVal);
-  };
+      Math.exp(-0.5 * Math.pow((x - composite_mean) / composite_std, 2));
+
+    const peakY = getGaussian(composite_mean);
+
+    yScale = scaleLinear()
+      .domain([0, peakY])
+      .range([GRAPH_HEIGHT - 10, 10]);
+
+    getNormalY = (xVal) => {
+      const yVal = getGaussian(xVal);
+      return yScale(yVal);
+    };
+
+    createNormalDistPath = () => {
+      const xValues = range(xMin, xMax, (xMax - xMin) / 100);
+      const normal = d3Shape
+        .line()
+        .x((d) => xScale(d))
+        .y((d) => yScale(getGaussian(d)));
+      return normal(xValues);
+    };
+  }
+
+  let boxColor = "#e74c3c";
+  let percentileMessage =
+    "일상에서의 불편함이 있을 수 있으며 지속적인 관리가 필요해 보입니다.";
+
+  if (composite_percentile !== null && composite_percentile !== undefined) {
+    if (composite_percentile <= 33) {
+      boxColor = "#2ecc71";
+      percentileMessage =
+        "척추 정렬이 매우 양호한 상태입니다. 현재 상태를 잘 유지하세요!";
+    } else if (composite_percentile <= 66) {
+      boxColor = "#f1c40f";
+      percentileMessage =
+        "약간의 불균형이 있지만 일상생활에 큰 지장은 없습니다. 꾸준한 관리가 필요합니다.";
+    }
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -91,51 +125,92 @@ const HomeScreen = () => {
         </View>
 
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>📊 종합 점수 분포</Text>
+          <Text style={styles.cardTitle}>📋 측만증 종합 분석</Text>
           <Text style={styles.cardDesc}>
-            아래 그래프는 사용자의 체형 점수가 전체 분포 중 어디에 위치하는지를
-            나타냅니다.
+            척추의 요정의 측만증 종합 분석은 환자의 정면 사진에서 추출한
+            지표들을 바탕으로 측만증 지표를 계산합니다.
           </Text>
 
-          <Svg
-            width={GRAPH_WIDTH}
-            height={GRAPH_HEIGHT}
-            style={{ alignSelf: "center" }}
+          <View
+            style={{
+              borderRadius: 12,
+              overflow: "hidden",
+              marginTop: 8,
+              marginBottom: 16,
+            }}
           >
-            {composite_mean && composite_std ? (
-              <>
-                <Path
-                  d={createNormalDistPath()}
-                  stroke="#fff"
-                  strokeWidth={2}
-                  fill="none"
-                />
-                {composite_score_current != null && (
-                  <Circle
-                    cx={xScale(composite_score_current)}
-                    cy={getNormalY(composite_score_current)}
-                    r={6}
-                    fill="#e74c3c"
-                  />
-                )}
-              </>
-            ) : (
-              <Text
-                style={{
-                  color: "#fff",
-                  fontSize: 13,
-                  textAlign: "center",
-                  marginTop: 30,
-                }}
-              >
-                데이터가 부족하여 그래프를 표시할 수 없습니다.
-              </Text>
-            )}
-          </Svg>
+            <Svg
+              width={GRAPH_WIDTH}
+              height={GRAPH_HEIGHT}
+              style={{ alignSelf: "center", backgroundColor: "transparent" }}
+            >
+              <Rect
+                x="0"
+                y="0"
+                width={GRAPH_WIDTH}
+                height={GRAPH_HEIGHT}
+                fill="#fff"
+                rx={12}
+                ry={12}
+              />
 
-          <Text style={styles.alertText}>
-            현재 위치: {composite_score_current?.toFixed(2) ?? "-"}점 (상위{" "}
-            {composite_percentile ?? "-"}%)
+              {composite_mean && composite_std ? (
+                <>
+                  <Path
+                    d={createNormalDistPath()}
+                    stroke="#000"
+                    strokeWidth={2}
+                    fill="none"
+                  />
+                  {composite_score_current != null && (
+                    <Circle
+                      cx={xScale(composite_score_current)}
+                      cy={getNormalY(composite_score_current)}
+                      r={6}
+                      fill={boxColor}
+                    />
+                  )}
+                </>
+              ) : (
+                <Text
+                  style={{
+                    color: "#fff",
+                    fontSize: 13,
+                    textAlign: "center",
+                    marginTop: 30,
+                  }}
+                >
+                  데이터가 부족하여 그래프를 표시할 수 없습니다.
+                </Text>
+              )}
+            </Svg>
+          </View>
+
+          <View
+            style={{
+              backgroundColor: boxColor,
+              padding: 8,
+              borderRadius: 8,
+              marginTop: 8,
+            }}
+          >
+            <Text style={{ color: "#fff", fontSize: 13, textAlign: "center" }}>
+              {reportData?.user?.age}대 {reportData?.user?.gender} 기준: 상위{" "}
+              {composite_percentile ?? "-"}% 입니다
+            </Text>
+          </View>
+
+          <Text style={styles.alertText}>{percentileMessage}</Text>
+
+          <Text
+            style={{
+              color: "#ccc",
+              fontSize: 11,
+              textAlign: "center",
+              marginTop: 8,
+            }}
+          >
+            ※ 정확한 치료는 반드시 대면 진료를 통해 숙지하시기 바랍니다.
           </Text>
         </View>
 
@@ -159,13 +234,25 @@ const HomeScreen = () => {
             { key: "hip_line_horizontal_tilt_deg", label: "골반 기울기(°)" },
             { key: "torso_vertical_tilt_deg", label: "몸통 수직 기울기(°)" },
             { key: "ear_hip_vertical_tilt_deg", label: "귀-골반 기울기(°)" },
-          ].map(({ key, label }) => {
-            const before = prev?.[key]?.toFixed(2) ?? "-";
-            const after = last?.[key]?.toFixed(2) ?? "-";
-            const delta = reportData?.changes?.[key] ?? "-";
+          ].map(({ key: propKey, label }) => {
+            const before =
+              prev && typeof prev[propKey] === "number"
+                ? prev[propKey].toFixed(2)
+                : "-";
+            const after =
+              last && typeof last[propKey] === "number"
+                ? last[propKey].toFixed(2)
+                : "-";
+            const delta =
+              prev &&
+              last &&
+              typeof differences[propKey] === "number" &&
+              !isNaN(differences[propKey])
+                ? differences[propKey].toFixed(2)
+                : "-";
 
             return (
-              <View style={styles.tableRow} key={key}>
+              <View style={styles.tableRow} key={propKey}>
                 <Text style={[styles.tableCell, { flex: 2 }]}>{label}</Text>
                 <Text style={styles.tableCell}>{before}</Text>
                 <Text style={styles.tableCell}>{after}</Text>

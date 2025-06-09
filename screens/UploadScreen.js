@@ -31,7 +31,7 @@ const UploadScreen = ({ navigation }) => {
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
+      allowsEditing: false,
       quality: 1,
     });
 
@@ -39,7 +39,6 @@ const UploadScreen = ({ navigation }) => {
       setPhoto(result.assets[0]);
     }
   };
-
   const uploadPhoto = async () => {
     if (!photo) return;
 

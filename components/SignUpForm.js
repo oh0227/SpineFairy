@@ -10,12 +10,12 @@ import colors from "../constants/colors";
 
 const initialState = {
   inputValues: {
-    fullName: "",
+    name: "",
     email: "",
     password: "",
   },
   inputValidities: {
-    fullName: false,
+    name: false,
     email: false,
     password: false,
   },
@@ -37,6 +37,7 @@ const SignUpForm = (props) => {
         inputValue,
         validationResult: result,
       });
+      console.log(formState.formIsValid);
     },
     [dispatchFormState]
   );
@@ -56,14 +57,14 @@ const SignUpForm = (props) => {
     <>
       <Input
         id="name"
-        label="Full Name"
+        label="이름"
         autoCapitalize="none"
         onInputChanged={inputChangedHandler}
-        errorText={formState.inputValidities["fullName"]}
+        errorText={formState.inputValidities["name"]}
       />
       <Input
         id="email"
-        label="Email"
+        label="이메일"
         autoCapitalize="none"
         keyboardType="email-address"
         onInputChanged={inputChangedHandler}
@@ -71,7 +72,7 @@ const SignUpForm = (props) => {
       />
       <Input
         id="password"
-        label="Password"
+        label="비밀번호"
         autoCapitalize="none"
         secureTextEntry
         onInputChanged={inputChangedHandler}

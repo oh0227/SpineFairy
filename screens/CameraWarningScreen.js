@@ -9,6 +9,9 @@ import {
   Dimensions,
 } from "react-native";
 import colors from "../constants/colors";
+import warning1 from "../assets/images/warning1.png";
+import warning2 from "../assets/images/warning2.png";
+import warning3 from "../assets/images/warning3.png";
 
 const { width } = Dimensions.get("window");
 
@@ -27,11 +30,7 @@ const CameraWarningScreen = ({ navigation }) => {
           사진이 수평이 맞지 않으면 정확한 분석이 어려워요.{"\n"}
           📷 핸드폰을 평평하게 들고 정면을 향해 촬영해 주세요.
         </Text>
-        <Image
-          source={{ uri: "YOUR_IMAGE_URL_1" }}
-          style={styles.tipImage}
-          resizeMode="cover"
-        />
+        <Image source={warning1} style={styles.tipImage} resizeMode="cover" />
       </View>
 
       <View style={styles.card}>
@@ -40,11 +39,7 @@ const CameraWarningScreen = ({ navigation }) => {
           촬영 시 자세가 바뀌면 분석에 오차가 생길 수 있어요.{"\n"}
           📌 가능한 한 팔, 다리, 몸의 위치를 고정해 주세요.
         </Text>
-        <Image
-          source={{ uri: "YOUR_IMAGE_URL_2" }}
-          style={styles.tipImage}
-          resizeMode="cover"
-        />
+        <Image source={warning2} style={styles.tipImage} resizeMode="cover" />
       </View>
 
       <View style={styles.card}>
@@ -53,11 +48,7 @@ const CameraWarningScreen = ({ navigation }) => {
           배경에 물건이 많거나 복잡하면 AI가 혼동할 수 있어요.{"\n"}✨ 흰 벽이나
           단색 커튼 앞에서 촬영해 주세요.
         </Text>
-        <Image
-          source={{ uri: "YOUR_IMAGE_URL_3" }}
-          style={styles.tipImage}
-          resizeMode="cover"
-        />
+        <Image source={warning3} style={styles.tipImage} resizeMode="cover" />
       </View>
 
       <TouchableOpacity style={styles.button} onPress={handleContinue}>

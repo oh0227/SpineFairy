@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -61,8 +61,13 @@ function formatKoreanDateTime(isoString) {
 // 예: "2025-06-05T13:45:00Z" -> "6/5"
 function formatShortDate(isoString) {
   if (!isoString) return "";
+
   const date = new Date(isoString);
-  return `${date.getMonth() + 1}/${date.getDate()}`;
+  const mmdd = `${date.getMonth() + 1}/${date.getDate()}`;
+  const time = `${String(date.getHours()).padStart(2, "0")}:${String(
+    date.getMinutes()
+  ).padStart(2, "0")}`;
+  return `${mmdd}|${time}`; // ← 이게 핵심
 }
 
 const AnalysisScreen = () => {
@@ -268,6 +273,7 @@ const AnalysisScreen = () => {
                   history.map((h) => h?.shoulder_line_horizontal_tilt_deg)
                 )}
                 labels={dateLabels}
+                yAxisSuffix="°"
               />
               <ChartBox
                 title="어깨 높이 차이"
@@ -275,6 +281,7 @@ const AnalysisScreen = () => {
                   history.map((h) => h?.shoulder_height_diff_px)
                 )}
                 labels={dateLabels}
+                yAxisSuffix="px"
               />
               <ChartBox
                 title="골반 기울기"
@@ -282,11 +289,13 @@ const AnalysisScreen = () => {
                   history.map((h) => h?.hip_line_horizontal_tilt_deg)
                 )}
                 labels={dateLabels}
+                yAxisSuffix="°"
               />
               <ChartBox
                 title="골반 높이 차이"
                 data={sanitizeData(history.map((h) => h?.hip_height_diff_px))}
                 labels={dateLabels}
+                yAxisSuffix="px"
               />
               <ChartBox
                 title="척추 기울기"
@@ -294,6 +303,7 @@ const AnalysisScreen = () => {
                   history.map((h) => h?.torso_vertical_tilt_deg)
                 )}
                 labels={dateLabels}
+                yAxisSuffix="°"
               />
               <ChartBox
                 title="귀-골반 수직 기울기"
@@ -301,6 +311,7 @@ const AnalysisScreen = () => {
                   history.map((h) => h?.ear_hip_vertical_tilt_deg)
                 )}
                 labels={dateLabels}
+                yAxisSuffix="°"
               />
             </>
           )}

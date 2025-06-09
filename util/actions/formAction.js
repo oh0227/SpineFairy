@@ -6,7 +6,7 @@ import {
 } from "../validationContraints";
 
 export const validateInput = (inputId, inputValue) => {
-  if (inputId === "fullName" || inputId === "gender") {
+  if (inputId === "name" || inputId === "gender") {
     return validateString(inputId, inputValue);
   } else if (inputId === "email") {
     return validateEmail(inputId, inputValue);

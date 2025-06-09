@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch } from "react-redux";
 
@@ -18,7 +19,7 @@ const SettingsScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.contentContainer}>
+      <View style={styles.contentContainer}>
         <Text style={styles.title}>사용자 정보 설정</Text>
         <InfoForm onPress={handleFormComplete} />
         {formCompleted && (
@@ -32,7 +33,7 @@ const SettingsScreen = () => {
           style={styles.logoutButton}
           color={colors.red}
         />
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 };
@@ -54,7 +55,7 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   logoutButton: {
-    marginTop: 30,
+    marginTop: 16,
   },
   confirmationText: {
     color: colors.primary,

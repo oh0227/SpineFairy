@@ -66,17 +66,16 @@ export const signIn = ({ email, password }) => {
   };
 };
 
-export const loadUserProfile = (user_id, { age, gender, weight, height }) => {
+export const loadUserProfile = (email, { age, gender, weight, height }) => {
   return async (dispatch) => {
     try {
       const response = await axios.post(`${BASE_URL}/profile`, {
-        user_id,
+        email,
         age: parseInt(age, 10),
         gender,
         weight: parseInt(weight, 10),
         height: parseInt(height, 10),
       });
-      console.log(response.status);
 
       dispatch(
         updateLoggedInUserData({

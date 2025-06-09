@@ -14,7 +14,7 @@ const isTestMode = true;
 
 const initialState = {
   inputValues: {
-    email: isTestMode ? "example@example.com" : "",
+    email: isTestMode ? "ramaba@test.com" : "",
     password: isTestMode ? "1234" : "",
   },
   inputValidities: {
@@ -58,7 +58,7 @@ const SignInForm = (props) => {
     <>
       <Input
         id="email"
-        label="Email"
+        label="이메일"
         autoCapitalize="none"
         keyboardType="email-address"
         onInputChanged={inputChangedHandler}
@@ -67,7 +67,7 @@ const SignInForm = (props) => {
       />
       <Input
         id="password"
-        label="Password"
+        label="비밀번호"
         autoCapitalize="none"
         secureTextEntry
         onInputChanged={inputChangedHandler}

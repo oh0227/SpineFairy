@@ -1,69 +1,96 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   View,
-  TextInput,
   Text,
-  Button,
   TouchableOpacity,
   StyleSheet,
+  FlatList,
+  Dimensions,
+  Modal,
+  Pressable,
 } from "react-native";
+import { AntDesign } from "@expo/vector-icons";
 import colors from "../constants/colors";
 
-const SelectInput = (props) => {
-  const [inputValue, setInputValue] = useState("");
+const SelectInput = ({ label, options, id, onInputChanged, errorText }) => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
-  const options = props.options;
+  const [dropdownPosition, setDropdownPosition] = useState({ x: 0, y: 0 });
+  const dropdownRef = useRef();
 
   const toggleDropdown = () => {
-    setIsDropdownVisible(!isDropdownVisible);
+    if (!isDropdownVisible) {
+      dropdownRef.current.measureInWindow((x, y, width, height) => {
+        setDropdownPosition({ x, y: y + height });
+        setIsDropdownVisible(true);
+      });
+    } else {
+      setIsDropdownVisible(false);
+    }
   };
 
   const handleOptionSelect = (option) => {
     setSelectedOption(option);
-    setInputValue(option);
-    props.onInputChanged && props.onInputChanged(props.id, option);
     setIsDropdownVisible(false);
+    onInputChanged && onInputChanged(id, option);
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>{props.label}</Text>
-        <TextInput
-          value={inputValue}
-          onChangeText={setInputValue}
-          placeholder="Select an option"
-          onFocus={toggleDropdown}
-        />
-        {isDropdownVisible && (
-          <View
-            style={{
-              borderWidth: 1,
-              borderColor: "gray",
-              padding: 10,
-              flexDirection: "row",
-            }}
-          >
-            {options.map((option, index) => (
-              <TouchableOpacity
-                key={index}
-                onPress={() => handleOptionSelect(option)}
-                style={{ padding: 10 }}
-              >
-                <Text>{option}</Text>
-              </TouchableOpacity>
-            ))}
+    <>
+      <View style={styles.container}>
+        <Text style={styles.label}>{label}</Text>
+
+        <View ref={dropdownRef}>
+          <TouchableOpacity onPress={toggleDropdown} style={styles.dropdown}>
+            <Text style={styles.selectedText}>
+              {selectedOption || "Select an option"}
+            </Text>
+            <AntDesign
+              name={isDropdownVisible ? "up" : "down"}
+              size={16}
+              color="gray"
+            />
+          </TouchableOpacity>
+        </View>
+
+        {errorText && (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{errorText[0]}</Text>
           </View>
         )}
       </View>
 
-      {props.errorText && (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>{props.errorText[0]}</Text>
-        </View>
-      )}
-    </View>
+      <Modal transparent visible={isDropdownVisible} animationType="fade">
+        <Pressable
+          style={StyleSheet.absoluteFill}
+          onPress={() => setIsDropdownVisible(false)}
+        >
+          <View
+            style={[
+              styles.absoluteOptionsContainer,
+              {
+                top: dropdownPosition.y,
+                left: dropdownPosition.x,
+                right: 32,
+              },
+            ]}
+          >
+            <FlatList
+              data={options}
+              keyExtractor={(item, index) => `${item}-${index}`}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.option}
+                  onPress={() => handleOptionSelect(item)}
+                >
+                  <Text style={styles.optionText}>{item}</Text>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+        </Pressable>
+      </Modal>
+    </>
   );
 };
 
@@ -72,44 +99,55 @@ export default SelectInput;
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    backgroundColor: "white",
     marginTop: 16,
-    borderRadius: 8,
-    borderColor: "#EDECF4",
-    borderWidth: 1,
   },
   label: {
-    marginVertical: 8,
+    marginBottom: 8,
     fontFamily: "regular",
-    letterSpacing: 0.3,
     color: colors.primary,
-    marginRight: 10,
+    fontSize: 14,
   },
-  inputContainer: {
-    width: "100%",
-    backgroundColor: "red",
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-
-    backgroundColor: colors.background,
+  dropdown: {
     flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    display: "flex",
+    padding: 12,
+    backgroundColor: "white",
+    borderWidth: 1,
+    borderColor: "#EDECF4",
+    borderRadius: 8,
   },
-  input: {
-    color: colors.textColor,
-    flex: 1,
+  selectedText: {
     fontFamily: "regular",
-    letterSpacing: 0.3,
-    paddingTop: 0,
+    fontSize: 14,
+    color: colors.textColor,
+  },
+  absoluteOptionsContainer: {
+    position: "absolute",
+    width: "80%",
+    backgroundColor: "white",
+    borderWidth: 1,
+    borderColor: "#EDECF4",
+    borderRadius: 8,
+    maxHeight: 200,
+    zIndex: 9999,
+    elevation: 5,
+    alignSelf: "center",
+  },
+  option: {
+    padding: 12,
+  },
+  optionText: {
+    fontSize: 14,
+    color: colors.textColor,
+    fontFamily: "regular",
   },
   errorContainer: {
-    marginVertical: 5,
+    marginTop: 5,
   },
   errorText: {
     color: "red",
     fontSize: 13,
     fontFamily: "regular",
-    letterSpacing: 0.3,
   },
 });

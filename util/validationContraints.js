@@ -29,9 +29,9 @@ export const validateString = (id, value) => {
 
   if (value !== "" && id !== "gender") {
     constraints.format = {
-      pattern: "[a-z]+",
+      pattern: "^[a-z가-힣]+$",
       flags: "i",
-      message: "value can only contain lettters",
+      message: "값은 영문자 또는 한글만 포함할 수 있습니다.",
     };
   }
 
@@ -61,8 +61,8 @@ export const validateIdPassword = (id, value) => {
 
   if (value !== "") {
     constraints.length = {
-      minimum: 6,
-      message: "must be at least 6 characters",
+      minimum: 4,
+      message: "must be at least 4 characters",
     };
   }
 
