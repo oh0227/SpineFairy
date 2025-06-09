@@ -19,7 +19,7 @@ function Indicator({ label, originalValue, changeValue, unit = "°" }) {
         >
           {isValidNumber
             ? `${originalValue.toFixed(2)} (${changeValue.toFixed(2)}${unit}`
-            : `${originalValue.toFixed(2)}`}
+            : `${originalValue?.toFixed(2) ?? "-"}`}
         </Text>
         {isValidNumber && changeValue > 0 && (
           <Text style={{ color: "#e74c3c", marginLeft: 2 }}>↑</Text>
