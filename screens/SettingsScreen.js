@@ -1,6 +1,11 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Keyboard,
+  TouchableWithoutFeedback,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch } from "react-redux";
 
@@ -18,23 +23,25 @@ const SettingsScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.contentContainer}>
-        <Text style={styles.title}>사용자 정보 설정</Text>
-        <InfoForm onPress={handleFormComplete} />
-        {formCompleted && (
-          <Text style={styles.confirmationText}>
-            ✅ 정보가 성공적으로 저장되었습니다!
-          </Text>
-        )}
-        <SubmitButton
-          title="로그아웃"
-          onPress={() => dispatch(userLogout())}
-          style={styles.logoutButton}
-          color={colors.red}
-        />
-      </View>
-    </SafeAreaView>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.contentContainer}>
+          <Text style={styles.title}>사용자 정보 설정</Text>
+          <InfoForm onPress={handleFormComplete} />
+          {formCompleted && (
+            <Text style={styles.confirmationText}>
+              ✅ 정보가 성공적으로 저장되었습니다!
+            </Text>
+          )}
+          <SubmitButton
+            title="로그아웃"
+            onPress={() => dispatch(userLogout())}
+            style={styles.logoutButton}
+            color={colors.red}
+          />
+        </View>
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 };
 
