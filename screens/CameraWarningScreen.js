@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#ddd", // 로딩 중 백업용
   },
   button: {
-    backgroundColor: "#22405a",
+    backgroundColor: colors.primaryLight,
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: "center",

@@ -49,10 +49,12 @@ const InfoForm = (props) => {
       setIsLoading(true);
       const action = loadUserProfile(userData.email, formState.inputValues);
       dispatch(action);
+
       dispatch(setUp());
-      setError(null);
     } catch (error) {
       setError(error.message);
+      setIsLoading(false);
+    } finally {
       setIsLoading(false);
     }
   }, [dispatch, formState]);
